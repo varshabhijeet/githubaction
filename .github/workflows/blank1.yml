@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+    - main
+env:
+  group: shiftleft-token
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: SCM_Gitleaks installtion and send report to defectdojo
+      run: |
+        wget https://github.com/zricethezav/gitleaks/releases/download/v7.2.0/gitleaks-linux-amd64
+        mv gitleaks-linux-amd64 gitleaks
+        chmod +x gitleaks
+        sudo mv gitleaks /usr/local/bin/
+        gitleaks --version
+        pwd
+        ls -ltr
+        gitleaks --path=. --config-path=./gitleaks-back.toml --report=scan.json --leaks-exit-code=0
+        cat scan.json
+        curl --location --request POST 'http://3.16.182.240:8080/api/v2/import-scan/' --header 'Authorization: Token 37c4b430210547f2a535f171036396ca6e72aba8' --form 'engagement=15' --form 'verified=true' --form 'active=true' --form 'scan_type=Gitleaks Scan' --form 'file=@scan.json'
+      shell: bash
+                    
