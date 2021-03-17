@@ -1,0 +1,24 @@
+on:
+  push:
+    branches:
+    - main
+env:
+  group: shiftleft-token
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: SCM_Gitleaks installtion and send report to defectdojo
+      run: |
+        wget https://github.com/zricethezav/gitleaks/releases/download/v7.2.0/gitleaks-linux-amd64
+        mv gitleaks-linux-amd64 gitleaks
+        chmod +x gitleaks
+        sudo mv gitleaks /usr/local/bin/
+        gitleaks --version
+        pwd
+        ls -ltr
+        gitleaks --path=. --config-path=./gitleaks-back.toml --report=scan.json --leaks-exit-code=0
+        cat scan.json
+      shell: bash
+                   
